@@ -14,7 +14,8 @@ const port = 8080;
 let state = "code";
 
 // Read and parse JSON. There is no __dirname for modules
-const secrets = JSON.parse(readFileSync(`${dirname(fileURLToPath(import.meta.url))}/../secrets.json`, "utf8"));
+const secretsFile = `${dirname(fileURLToPath(import.meta.url))}/../secrets.json`;
+const secrets = JSON.parse(readFileSync(secretsFile, "utf8"));
 
 // Express route that prints request body and query parameters
 app.use("/", (req, res) => {
@@ -64,7 +65,7 @@ async function getToken(googleResponse) {
     console.log("Got the token!");
     console.log("Writing token to secrets...");
     secrets.refreshToken = data.refresh_token;
-    writeFileSync("./secrets.json", JSON.stringify(secrets));
+    writeFileSync(secretsFile, JSON.stringify(secrets, null, 2));
     console.log("Done!");
 
     server.close();
