@@ -21,7 +21,7 @@ const rl = readline.createInterface({
     do {
         const response = await fetch(`https://photoslibrary.googleapis.com/v1/albums?pageSize=50${nextPageToken ? `&${nextPageToken}`: ""}`, {
             headers: {
-                Authorization: `Bearer ${await getToken()}`,
+                Authorization: `Bearer ${(await getToken())[0]}`,
                 "Content-Type": "application/json"
             }
         });
