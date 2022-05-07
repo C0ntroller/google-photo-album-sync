@@ -44,9 +44,14 @@ const rl = readline.createInterface({
             break;
         }
     }
+    const album = albums[Number.parseInt(albumIndex) - 1];
     rl.close();
-    secrets.albumId = albums[albumIndex-1].id;
-    console.log("Writeing album ID to secrets...");
+    console.log("Writeing album settings to secrets...");
+    secrets.album = {
+        name: album.title,
+        id: album.id,
+        count: album.mediaItemsCount
+    };
     writeFileSync(secretsFile, JSON.stringify(secrets, null, 2));
     console.log("Done!");
 })()
