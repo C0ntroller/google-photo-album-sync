@@ -1,12 +1,11 @@
 import fetch from "node-fetch";
 import readline from "readline";
-import { exit } from "process";
 import { writeFileSync } from "fs";
 import { secretsFile, secrets, getToken } from "./common.js";
 
 if (!secrets.refreshToken) {
     console.error("No refresh token found. Please run 'npm run token' first.");
-    exit();
+    process.exit(1);
 }
 
 const rl = readline.createInterface({
