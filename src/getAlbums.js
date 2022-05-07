@@ -5,7 +5,7 @@ import { writeFileSync } from "fs";
 import { secretsFile, secrets, getToken } from "./common.js";
 
 if (!secrets.refreshToken) {
-    console.error("No refresh token found. Please run 'npm run getToken' first.");
+    console.error("No refresh token found. Please run 'npm run token' first.");
     exit();
 }
 
