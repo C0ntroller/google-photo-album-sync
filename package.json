@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "albums": "node src/getAlbums.js",
+    "sync": "node src/sync.js",
     "token": "node src/getToken.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
