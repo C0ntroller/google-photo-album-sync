@@ -13,9 +13,10 @@ if (!secrets.refreshToken) {
 
 const args = process.argv.slice(2);
 const argsConfig = {
-    path: args.length > 0 ? args[0] : "./album",
+    path: args.length > 0 && !args[0].startsWith("--") ? args[0] : "./album",
     downloadVideo: false, //args.includes("--video") not implemented,
     downloadRaw: args.includes("--raw"),
+    removeOld: args.includes("--cleanup")
 }
 argsConfig.path = path.resolve(argsConfig.path);
 
@@ -38,6 +39,7 @@ if (!fs.existsSync(argsConfig.path)) {
 let tokenDeath = 0;
 let token = "";
 const filenameCounter = {};
+const filesBefore = fs.readdirSync(argsConfig.path);
 
 function shouldDownload(mimeType) {
     switch (true) {
@@ -68,6 +70,12 @@ async function syncImage(imageObject) {
     filenameCounter[imageObject.filename] = filenameCounter[imageObject.filename] ? filenameCounter[imageObject.filename] + 1 : 1;
 
     const filepath = path.resolve(argsConfig.path, filename);
+    // Remove files from list
+    const idx = filesBefore.indexOf(filename);
+    if(idx > -1) {
+        filesBefore.splice(idx, 1);
+    }
+
     if (fs.existsSync(filepath)) {
         console.log(`Skipping ${filename} (already exists)`);
         return
@@ -147,4 +155,11 @@ async function updateAlbumData() {
 
         await downloadList(data.mediaItems);
     } while (nextPageToken);
+
+    if (argsConfig.removeOld) {
+        console.log("Removing old files...");
+        for (const file of filesBefore) {
+            fs.unlinkSync(path.resolve(argsConfig.path, file));
+        }
+    }
 })()
