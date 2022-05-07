@@ -5,6 +5,11 @@ import fetch from "node-fetch";
 import { writeFileSync } from "fs";
 import { secretsFile, secrets } from "./common.js";
 
+if (!secrets.clientId || !secrets.clientSecret) {
+    console.error("No client credentials token found. Please run 'npm run token' first.");
+    process.exit(1);
+}
+
 const app = express()
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
