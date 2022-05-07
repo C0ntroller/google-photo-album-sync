@@ -2,10 +2,10 @@
   "name": "google-photo-album-sync",
   "version": "1.0.0",
   "description": "Syncs a google photo album with a harddrive",
-  "main": "index.js",
+  "main": "src/sync.js",
   "type": "module",
   "scripts": {
-    "token": "node getToken.js",
+    "token": "node src/getToken.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [

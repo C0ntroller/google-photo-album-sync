@@ -2,7 +2,9 @@ import express from "express";
 import bodyParser from "body-parser";
 import open from "open";
 import fetch from "node-fetch";
-import {readFileSync, writeFileSync} from "fs"
+import {readFileSync, writeFileSync} from "fs";
+import {dirname} from "path";
+import {fileURLToPath} from "url";
 
 const app = express()
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -11,8 +13,8 @@ const port = 8080;
 
 let state = "code";
 
-// Read and parse JSON
-const secrets = JSON.parse(readFileSync("./secrets.json", "utf8"));
+// Read and parse JSON. There is no __dirname for modules
+const secrets = JSON.parse(readFileSync(`${dirname(fileURLToPath(import.meta.url))}/../secrets.json`, "utf8"));
 
 // Express route that prints request body and query parameters
 app.use("/", (req, res) => {
@@ -20,7 +22,7 @@ app.use("/", (req, res) => {
         case "code": {
             state = "token";
             getToken(req.query);
-            res.status(200).json(req.query).end();
+            res.status(200).send("Done! You can close this window.").end();
             break;
         }
         case "token": {
@@ -30,17 +32,6 @@ app.use("/", (req, res) => {
         }
         default: res.status(400).end();
     } 
-});
-
-app.use("/token", (req, res) => {
-    console.log({
-        get: req.query,
-        post: req.body
-    });
-    res.status(200).json({
-        get: req.query,
-        post: req.body
-    }).end()
 });
 
 const server = app.listen(port, () => console.log(`Example app listening on port ${port}!`));
