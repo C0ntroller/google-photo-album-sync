@@ -1,12 +1,12 @@
 import fetch from "node-fetch";
 import fs from "fs";
 import path from "path";
-import { secrets, getToken } from "./common.js";
+import { secretsFile, secrets, getToken } from "./common.js";
 
 if (!secrets.refreshToken) {
     console.error("No refresh token found. Please run 'npm run token' first.");
     process.exit(1);
-} else if (!secrets.album || !secrets.album.id || !secrets.album.count || !secrets.album.name) {
+} else if (!secrets.album || !secrets.album.id) {
     console.error("No valid album found in secrets. Please run 'npm run albums' first.");
     process.exit(1);
 }
@@ -87,21 +87,51 @@ async function downloadList(imageList) {
     await Promise.all(asyncDownloads);
 }
 
+async function checkTokenUpdate() {
+    if(tokenDeath < Date.now()) {
+        const [newToken, expiresIn] = await getToken();
+        token = newToken;
+        tokenDeath = Date.now() + (expiresIn - 30) * 1000;
+    }
+}
+
+async function updateAlbumData() {
+    const response = await fetch(`https://photoslibrary.googleapis.com/v1/albums/${secrets.album.id}`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+        }
+    });
+    if (response.status !== 200) {
+        console.error("Could not fetch album data: ", response.status);
+        console.error("Was the album deleted?");
+        process.exit(1);
+    }
+    const data = await response.json();
+
+    if (secrets.album.name !== data.title || secrets.album.count !== data.mediaItemsCount) {
+        secrets.album.name = data.title;
+        secrets.album.count = data.mediaItemsCount;
+        fs.writeFileSync(secretsFile, JSON.stringify(secrets, null, 2));
+    }
+
+}
+
 (async () => {
+    await checkTokenUpdate();
+    await updateAlbumData();
+
     let nextPageToken;
     let runs = 0;
     do {
-        if(tokenDeath < Date.now()) {
-            const [newToken, expiresIn] = await getToken();
-            token = newToken;
-            tokenDeath = Date.now() + (expiresIn - 30) * 1000;
-        }
+        await checkTokenUpdate();
 
         const searchOptions = {
             albumId: secrets.album.id,
             pageSize: 100
-        }
+        };
         if (nextPageToken) searchOptions.pageToken = nextPageToken;
+
         const response = await fetch("https://photoslibrary.googleapis.com/v1/mediaItems:search", {
             method: "POST",
             body: JSON.stringify(searchOptions),
@@ -111,8 +141,10 @@ async function downloadList(imageList) {
             }
         });
         const data = await response.json();
+
         nextPageToken = data.nextPageToken;
         console.log(`Downloading images ${runs * 100 + 1} to ${runs * 100 + data.mediaItems.length}... (of ${secrets.album.count})`);
+
         await downloadList(data.mediaItems);
     } while (nextPageToken);
 })()
