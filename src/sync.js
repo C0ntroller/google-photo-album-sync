@@ -16,7 +16,9 @@ const argsConfig = {
     path: args.length > 0 && !args[0].startsWith("--") ? args[0] : "./album",
     downloadVideo: false, //args.includes("--video") not implemented,
     downloadRaw: args.includes("--raw"),
-    removeOld: args.includes("--cleanup")
+    removeOld: args.includes("--cleanup"),
+    forceDownload: args.includes("--force"),
+    quiet: args.includes("--quiet")
 }
 argsConfig.path = path.resolve(argsConfig.path);
 
@@ -76,8 +78,8 @@ async function syncImage(imageObject) {
         filesBefore.splice(idx, 1);
     }
 
-    if (fs.existsSync(filepath)) {
-        console.log(`Skipping ${filename} (already exists)`);
+    if (!argsConfig.forceDownload && fs.existsSync(filepath)) {
+        if (!argsConfig.quiet) console.log(`Skipping ${filename} (already exists)`);
         return
     };
 
@@ -151,13 +153,13 @@ async function updateAlbumData() {
         const data = await response.json();
 
         nextPageToken = data.nextPageToken;
-        console.log(`Downloading images ${runs * 100 + 1} to ${runs * 100 + data.mediaItems.length}... (of ${secrets.album.count})`);
+        if (!argsConfig.quiet) console.log(`Downloading images ${runs * 100 + 1} to ${runs * 100 + data.mediaItems.length}... (of ${secrets.album.count})`);
 
         await downloadList(data.mediaItems);
     } while (nextPageToken);
 
     if (argsConfig.removeOld) {
-        console.log("Removing old files...");
+        if (!argsConfig.quiet) console.log("Removing old files...");
         for (const file of filesBefore) {
             fs.unlinkSync(path.resolve(argsConfig.path, file));
         }
