@@ -1,32 +1,12 @@
 import fetch from "node-fetch";
 import readline from "readline";
-import {readFileSync, writeFileSync} from "fs";
 import { exit } from "process";
-import {dirname} from "path";
-import {fileURLToPath} from "url";
-
-// Read and parse JSON. There is no __dirname for modules
-const secretsFile = `${dirname(fileURLToPath(import.meta.url))}/../secrets.json`;
-const secrets = JSON.parse(readFileSync(secretsFile, "utf8"));
+import { writeFileSync } from "fs";
+import { secretsFile, secrets, getToken } from "./common.js";
 
 if (!secrets.refreshToken) {
     console.error("No refresh token found. Please run 'npm run getToken' first.");
     exit();
-}
-
-async function getToken() {
-    const response = await fetch("https://oauth2.googleapis.com/token", {
-        method: "POST",
-        body: JSON.stringify({
-            client_id: secrets.clientId,
-            client_secret: secrets.clientSecret,
-            grant_type: "refresh_token",
-            refresh_token: secrets.refreshToken
-        }),
-        headers: {'Content-Type': 'application/json'}
-    });
-    const data = await response.json();
-    return data.access_token;
 }
 
 const rl = readline.createInterface({

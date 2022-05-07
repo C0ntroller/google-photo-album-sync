@@ -2,9 +2,8 @@ import express from "express";
 import bodyParser from "body-parser";
 import open from "open";
 import fetch from "node-fetch";
-import {readFileSync, writeFileSync} from "fs";
-import {dirname} from "path";
-import {fileURLToPath} from "url";
+import { writeFileSync } from "fs";
+import { secretsFile, secrets } from "./common.js";
 
 const app = express()
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -12,10 +11,6 @@ app.use(bodyParser.json());
 const port = 8080;
 
 let state = "code";
-
-// Read and parse JSON. There is no __dirname for modules
-const secretsFile = `${dirname(fileURLToPath(import.meta.url))}/../secrets.json`;
-const secrets = JSON.parse(readFileSync(secretsFile, "utf8"));
 
 // Express route that prints request body and query parameters
 app.use("/", (req, res) => {
