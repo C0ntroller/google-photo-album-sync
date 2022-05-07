@@ -14,7 +14,8 @@
     "photos",
     "sync",
     "google",
-    "cloud"
+    "cloud",
+    "download"
   ],
   "author": "Daniel Kluge",
   "license": "GPL-3.0",
