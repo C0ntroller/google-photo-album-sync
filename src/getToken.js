@@ -35,7 +35,7 @@ app.use("/", (req, res) => {
     } 
 });
 
-const server = app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+const server = app.listen(port, () => console.log(`Callback server listening on port ${port}!`));
 
 const token = "miau";
 
