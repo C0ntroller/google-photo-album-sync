@@ -1,4 +1,7 @@
 # Google Photo Album Sync
+
+[![Read the blog entry at c0ntroller.de](https://c0ntroller.de/img/read-blog.svg)](https://c0ntroller.de/#/project/photo-sync)
+
 A script that will download all images from an album.
 Perfect to use if you have a local directory for your background, chromecast or whatever.
 

@@ -63,7 +63,7 @@ async function syncImage(imageObject) {
         
         Solution: We use a counter to keep track of how many times we've downloaded
         the same filename. This is only dependend on the sync but not accross syncs.
-        This want work when the creation time of the images change because Google sorts
+        This wont work when the creation time of the images change because Google sorts
         images by that. And we can't sort them ourself because "orderBy" needs a
         "dateFilter" and that is exclusive with the "albumId"...
     */
